@@ -1,0 +1,139 @@
+import pygame
+import gif_pygame
+pygame.init()
+
+
+window=pygame.display.set_mode((800,600))
+clock = pygame.time.Clock()
+
+x=0
+y= 429
+
+#sprites
+star_guy_spr = pygame.image.load("pixil-frame-0.png").convert_alpha()
+star_guy_spr=pygame.transform.scale(star_guy_spr,(star_guy_spr.get_width()*2,star_guy_spr.get_height()*2))
+bullet = pygame.image.load("pixil-frame-0 (20).png").convert_alpha()
+bullet2 = pygame.image.load("pixil-frame-0 (21).png").convert_alpha()
+bullet=pygame.transform.smoothscale_by(bullet,0.5)
+bullet2=pygame.transform.smoothscale_by(bullet2,0.5)
+cloud_enemy = pygame.image.load("ezgif.com-animated-gif-maker (3).gif")
+
+walk_right_gif = gif_pygame.load("ezgif.com-resize.gif")
+walk_left_gif = gif_pygame.load("ezgif.com-resize (1).gif")
+
+backround1 = pygame.image.load("pixil-frame-0 (23).png").convert()
+backround = (31,46,82)
+
+
+s1 = pygame.Surface((20, 0))
+s2 = pygame.Surface((20, 0))
+s3 = pygame.Surface((20, 0))
+s1.fill((255, 0, 0))
+s2.fill((0, 255, 0))
+s3.fill((0, 0, 255))
+
+animation_surfs = gif_pygame.GIFPygame([[s1, 1], [s2, 1], [s3, 0.5]])
+font = pygame.font.Font(None, size = 25)
+game_font2 =pygame.font.Font("Raw Notice.ttf", size = 68)
+gg = font.render("Try Again!",True,(199,80,107))
+warning =font.render("Simple game just avoid the bullets and get a high score!",True,(240,235,168))
+pitch_black = (0,0,0)
+
+br= 1
+
+
+hp = 5
+
+bullet_x = 500
+bullet_y = 0
+bullet_x2 = 500
+bullet_y2 = -300
+
+
+running = True
+
+#game screen
+window.fill(backround)
+Nighttime1 = game_font2.render("Nighttime",True,(240,235,168))
+window.blit(Nighttime1,(210,210))
+pygame.display.flip()
+pygame.time.wait(3000)
+
+#instructions
+window.fill(backround)
+window.blit(warning,(180, 200))
+pygame.display.flip()
+pygame.time.wait(3000)
+
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+    
+    
+    pressed_keys = pygame.key.get_pressed()
+
+   
+    window.blit(backround1,(0,0))
+    br1 = True
+    window.blit(star_guy_spr,(x,y))
+    
+    #moving left and right onscreen
+    if pressed_keys[pygame.K_RIGHT]:
+        x = x + 2.5
+        window.blit(backround1,(0,0))
+        walk_right_gif.render(window, (x, y))
+    if pressed_keys[pygame.K_LEFT]:
+        x = x -2.5
+        window.blit(backround1,(0,0))
+        walk_left_gif.render(window, (x, y))
+    
+        #star guy and bullet hitboxes
+    hitbox = pygame.Rect(x +47, y+10, star_guy_spr.get_width()/2.4, star_guy_spr.get_height()/1.08)
+    target = pygame.Rect(bullet_x,bullet_y,9,9)
+    target2 = pygame.Rect(bullet_x2,bullet_y2,9,9)
+    collision = hitbox.colliderect(target)
+    collision2 = hitbox.colliderect(target2)
+    pygame.draw.rect(window,(31,46,82),target)
+    pygame.draw.rect(window,(31,46,82),target2)
+    window.blit(bullet,(bullet_x,bullet_y))
+    window.blit(bullet2,(bullet_x2,bullet_y2))
+    if bullet_y > 620:
+        bullet_y = 0
+        bullet_x = 500
+    if bullet_y2 > 620:
+        bullet_y2 = 0
+        bullet_x2 = 500
+
+    #bullet machenics
+    bullet_y += 2
+    bullet_y2 += 2
+
+    if x > 800:
+        x = -50
+
+    if x <-80:
+        x = -80
+
+        window.blit(cloud_enemy,(500,300))
+
+ # Make sure to make death not permenent
+    if collision == True or collision2 == True:
+        hp -= 5
+        print(hp)
+    if hp < 0:
+        running = False
+        window.fill(pitch_black)
+        window.blit(gg,(200, 150))
+
+    pygame.display.flip()
+
+    clock.tick(60)
+
+
+
+pygame.time.wait(800)
+
+
+
+pygame.quit()
