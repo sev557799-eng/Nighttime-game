@@ -1,6 +1,7 @@
 import pygame
 import gif_pygame
 pygame.init()
+import random
 
 
 window=pygame.display.set_mode((800,600))
@@ -12,123 +13,329 @@ y= 429
 #sprites
 star_guy_spr = pygame.image.load("pixil-frame-0.png").convert_alpha()
 star_guy_spr=pygame.transform.scale(star_guy_spr,(star_guy_spr.get_width()*2,star_guy_spr.get_height()*2))
+dead_star_guy = pygame.image.load("pixil-frame-0 (35).png").convert_alpha()
+dead_star_guy =pygame.transform.scale(dead_star_guy,(dead_star_guy.get_width()*2,dead_star_guy.get_height()*2))
 bullet = pygame.image.load("pixil-frame-0 (20).png").convert_alpha()
-bullet2 = pygame.image.load("pixil-frame-0 (21).png").convert_alpha()
 bullet=pygame.transform.smoothscale_by(bullet,0.5)
-bullet2=pygame.transform.smoothscale_by(bullet2,0.5)
-cloud_enemy = pygame.image.load("ezgif.com-animated-gif-maker (3).gif")
+cloud_enemy = gif_pygame.load("ezgif.com-resize (2).gif")
+cloud_enemy2 = gif_pygame.load("ezgif.com-resize (2).gif")
+stars = pygame.image.load("pixil-frame-0 (36).png")
 
 walk_right_gif = gif_pygame.load("ezgif.com-resize.gif")
 walk_left_gif = gif_pygame.load("ezgif.com-resize (1).gif")
 
-backround1 = pygame.image.load("pixil-frame-0 (23).png").convert()
+backround1 = pygame.image.load("pixil-frame-0 (30).png").convert()
+backround1=pygame.transform.scale(backround1,(800,600))
 backround = (31,46,82)
 
 
 s1 = pygame.Surface((20, 0))
 s2 = pygame.Surface((20, 0))
 s3 = pygame.Surface((20, 0))
+s4 = pygame.Surface((20, 0))
+s5 = pygame.Surface((20, 0))
+s6 = pygame.Surface((20, 0))
 s1.fill((255, 0, 0))
 s2.fill((0, 255, 0))
 s3.fill((0, 0, 255))
+s4.fill((255, 0, 0))  
+s5.fill((0, 255, 0))
+s6.fill((0, 0, 255))
 
 animation_surfs = gif_pygame.GIFPygame([[s1, 1], [s2, 1], [s3, 0.5]])
-font = pygame.font.Font(None, size = 25)
-game_font2 =pygame.font.Font("Raw Notice.ttf", size = 68)
+animation_surfs2 = gif_pygame.GIFPygame([[s4, 1], [s5, 1], [s6, 0.5]])
+font = pygame.font.Font("Impact.ttf", size = 20)
+game_font2 =pygame.font.Font("inlanders Demo.otf", size = 110)
+game_font3 =pygame.font.Font("Linebeam.ttf", size = 50)
 gg = font.render("Try Again!",True,(199,80,107))
-warning =font.render("Simple game just avoid the bullets and get a high score!",True,(240,235,168))
+message1 = game_font3.render("What am I doing?",True,(199,80,107))
+warning =font.render("Simple game just avoid the bullets and get a high score!\n\n                           Use arrows to move left/right",True,(240,235,168))
 pitch_black = (0,0,0)
 
-br= 1
+class Bullet:
+    x = 0 
+    y = 0
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
 
 
+Screen = 1
+Cutscene = 0
 hp = 5
+collision = False
 
-bullet_x = 500
-bullet_y = 0
-bullet_x2 = 500
-bullet_y2 = -300
+
+
+
+cloud_x = 450
+cloud_y = 50
+cloud_x2 = 1100
+cloud_y2 = 50
+#1
+bullet_1 = Bullet(500, 0)
+bullet_2 = Bullet(500, -300)
+#2
+bullet_3 = Bullet(350, 250 +150)
+bullet_4 = Bullet(350, 250 +125)
+bullet_5 = Bullet(350, 250 +95)
+bullet_6 = Bullet(350, 250 +70)
+#3
+bullet_7 = Bullet(410, 200)
+bullet_8 = Bullet(460, 160)
+bullet_9 = Bullet(500, 120)
+bullet_10 = Bullet(570, 200)
+bullet_11 = Bullet(620, 160)
+bullet_12 = Bullet(670, 120)
+bullet_13 = Bullet(710, 200)
+bullet_14 = Bullet(760, 160)
+bullet_15 = Bullet(800, 120)
+#4
+bullet_16 = Bullet(cloud_x+ 40, cloud_y + 270)
+bullet_17 = Bullet(cloud_x+ 110, cloud_y + 320)
+bullet_18 = Bullet(cloud_x+ 170, cloud_y + 380)
+bullet_19 = Bullet(cloud_x+ 40, cloud_y + 50)
+bullet_20 = Bullet(cloud_x+ 90, cloud_y + 80)
+bullet_21 = Bullet(cloud_x+ 140, cloud_y + 140)
+bullet_22 = Bullet(cloud_x+ 60, cloud_y + 165)
+bullet_23 = Bullet(cloud_x+ 130, cloud_y + 235)
+#5
+bullet_24 = Bullet(cloud_x2+ 170, cloud_y2 + 380)
+bullet_25 = Bullet(cloud_x2+ 40, cloud_y2 + 50)
+bullet_26 = Bullet(cloud_x2+ 90, cloud_y2 + 80)
+bullet_27 = Bullet(cloud_x2+ 140, cloud_y2 + 140)
+bullet_28 = Bullet(cloud_x2+ 60, cloud_y2 + 165)
+bullet_29 = Bullet(cloud_x2+ 130, cloud_y2 + 235)
 
 
 running = True
 
 #game screen
+pygame.display.set_caption('NIGHTIME')
 window.fill(backround)
+window.blit(stars,(0,0))
 Nighttime1 = game_font2.render("Nighttime",True,(240,235,168))
-window.blit(Nighttime1,(210,210))
+open_game = font.render("Press Enter to start new game",True,(240,235,168))
+window.blit(Nighttime1,(150,250))
+window.blit(open_game,(160,350))
 pygame.display.flip()
 pygame.time.wait(3000)
 
 #instructions
 window.fill(backround)
-window.blit(warning,(180, 200))
+window.blit(warning,(170, 200))
 pygame.display.flip()
 pygame.time.wait(3000)
+
 
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-    
-    
-    pressed_keys = pygame.key.get_pressed()
 
+    pressed_keys = pygame.key.get_pressed()
    
     window.blit(backround1,(0,0))
-    br1 = True
     window.blit(star_guy_spr,(x,y))
     
     #moving left and right onscreen
-    if pressed_keys[pygame.K_RIGHT]:
+    if pressed_keys[pygame.K_RIGHT] and not pressed_keys[pygame.K_LEFT]:
         x = x + 2.5
         window.blit(backround1,(0,0))
         walk_right_gif.render(window, (x, y))
-    if pressed_keys[pygame.K_LEFT]:
+    if pressed_keys[pygame.K_LEFT] and not pressed_keys[pygame.K_RIGHT]:
         x = x -2.5
         window.blit(backround1,(0,0))
         walk_left_gif.render(window, (x, y))
     
-        #star guy and bullet hitboxes
-    hitbox = pygame.Rect(x +47, y+10, star_guy_spr.get_width()/2.4, star_guy_spr.get_height()/1.08)
-    target = pygame.Rect(bullet_x,bullet_y,9,9)
-    target2 = pygame.Rect(bullet_x2,bullet_y2,9,9)
-    collision = hitbox.colliderect(target)
-    collision2 = hitbox.colliderect(target2)
-    pygame.draw.rect(window,(31,46,82),target)
-    pygame.draw.rect(window,(31,46,82),target2)
-    window.blit(bullet,(bullet_x,bullet_y))
-    window.blit(bullet2,(bullet_x2,bullet_y2))
-    if bullet_y > 620:
-        bullet_y = 0
-        bullet_x = 500
-    if bullet_y2 > 620:
-        bullet_y2 = 0
-        bullet_x2 = 500
-
-    #bullet machenics
-    bullet_y += 2
-    bullet_y2 += 2
-
     if x > 800:
         x = -50
+        if Screen == 4:
+            cloud_x = 300
+        if Screen == 5:
+            Cutscene += 1
+        Screen += 1
 
     if x <-80:
         x = -80
+        
 
-        window.blit(cloud_enemy,(500,300))
+        #star guy and bullet hitboxes
+    hitbox = pygame.Rect(x +47, y+10, star_guy_spr.get_width()/2.4, star_guy_spr.get_height()/1.08)
+    
+    if Screen == 1:
+        for _bullet in [bullet_1, bullet_2]:
+            window.blit(bullet,(_bullet.x,_bullet.y))
+            target = pygame.Rect(_bullet.x,_bullet.y,9,9)
+            if collision == False:
+                collision = hitbox.colliderect(target)
+            if _bullet.y > 620:
+                _bullet.y = 0
+                _bullet.x = 500
+            _bullet.y += 2
+
+        # if bullet_2.y > 620:
+        #     bullet_2.y = 0
+        #     bullet_2.x = 500
+
+        #bullet machenics
+        # bullet_1.y += 2
+        # bullet_2.y += 2
+
+        
+            
+    if Screen == 2:
+        cloud_enemy.render(window, (cloud_x, cloud_y))
+        for _bullet in [bullet_1, bullet_2]:
+            _bullet.x = -900
+            _bullet.y = -900
+
+        for _bullet in [bullet_3, bullet_4, bullet_5, bullet_6]:
+            window.blit(bullet, (_bullet.x , _bullet.y))
+            target = pygame.Rect(_bullet.x , _bullet.y, 9,9)
+            if collision == False:
+                collision = hitbox.colliderect(target)
+            if _bullet.y > 690:
+                _bullet.y = cloud_y + 230
+                _bullet.x = cloud_x + 40
+            _bullet.y += 2
+            _bullet.x -= 1
+
+
+    if Screen == 3:
+        cloud_x = 360
+        cloud_y = 70
+        cloud_enemy.render(window, (cloud_x, cloud_y))
+        for _bullet in [bullet_3, bullet_4, bullet_5, bullet_6]:
+            _bullet.x = -900
+            _bullet.y = -900
+        for _bullet in [bullet_7, bullet_8, bullet_9]:
+            window.blit(bullet, (_bullet.x , _bullet.y))
+            target = pygame.Rect(_bullet.x , _bullet.y, 9,9)
+            if collision == False:
+                collision = hitbox.colliderect(target)
+            if _bullet.y > 660:
+                _bullet.y = 180
+                _bullet.x = 410
+            _bullet.y += 2
+            _bullet.x -= 1
+        for _bullet in [bullet_10, bullet_11, bullet_12]:
+            window.blit(bullet, (_bullet.x , _bullet.y))
+            target = pygame.Rect(_bullet.x , _bullet.y, 9,9)
+            if collision == False:
+                collision = hitbox.colliderect(target)
+            if _bullet.y > 770:
+                _bullet.y = 300
+                _bullet.x = 530
+            _bullet.y += 2
+            _bullet.x -= 1
+        for _bullet in [bullet_13, bullet_14, bullet_15]:
+            window.blit(bullet, (_bullet.x , _bullet.y))
+            target = pygame.Rect(_bullet.x , _bullet.y, 9,9)
+            if collision == False:
+                collision = hitbox.colliderect(target)
+            if _bullet.y > 880:
+                _bullet.y = 260
+                _bullet.x = 730
+            _bullet.y += 2
+            _bullet.x -= 1
+                
+    if Screen == 4:
+        cloud_enemy.render(window, (cloud_x, cloud_y))
+        if pressed_keys[pygame.K_RIGHT]:
+            cloud_x = cloud_x - 1
+            window.blit(backround1,(0,0))
+            walk_right_gif.render(window, (x, y))
+            cloud_enemy.render(window, (cloud_x, cloud_y))
+        if pressed_keys[pygame.K_LEFT]:
+            cloud_x += 1
+            window.blit(backround1,(0,0))
+            walk_left_gif.render(window, (x, y))
+            cloud_enemy.render(window, (cloud_x, cloud_y))
+        for _bullet in [bullet_7, bullet_8, bullet_9, bullet_10,bullet_11,bullet_12,bullet_13,bullet_14,bullet_15]:
+            _bullet.x = -900
+            _bullet.y = -900
+
+        for _bullet in [bullet_16, bullet_17, bullet_18, bullet_19, bullet_20, bullet_21]:
+            window.blit(bullet, (_bullet.x , _bullet.y))
+            target = pygame.Rect(_bullet.x , _bullet.y, 9,9)
+            if collision == False:
+                collision = hitbox.colliderect(target)
+            if _bullet.y > 685:
+                _bullet.y = _bullet.y - 500
+                rand_x = random.randint(10,330)
+                _bullet.x = cloud_x + rand_x
+            _bullet.y += 4
+        
+    if Screen == 5:
+        cloud_enemy.render(window, (cloud_x+100, cloud_y-20))
+        cloud_x -= 0.5
+        cloud_enemy2.render(window, (cloud_x2, cloud_y2-20))
+        cloud_x2 -= 0.5
+        for _bullet in [bullet_16, bullet_17, bullet_18, bullet_19, bullet_20, bullet_21]:
+            window.blit(bullet, (_bullet.x , _bullet.y+ 20))
+            target = pygame.Rect(_bullet.x , _bullet.y+ 20, 9,9)
+            if collision == False:
+                collision = hitbox.colliderect(target)
+            if _bullet.y > 680:
+                _bullet.y = _bullet.y - 500
+                rand_x = random.randint(30,330)
+                _bullet.x = cloud_x + rand_x
+            _bullet.y += 4
+            _bullet.x +=1
+        for _bullet in [bullet_22, bullet_23, bullet_24, bullet_25, bullet_26, bullet_27]:
+            rand_y = random.randint(0,70)
+            window.blit(bullet, (_bullet.x , _bullet.y))
+            target = pygame.Rect(_bullet.x , _bullet.y, 9,9)
+            if collision == False:
+                collision = hitbox.colliderect(target)
+            if _bullet.y > 660:
+                _bullet.y = _bullet.y - 500
+                rand_x = random.randint(30,330)
+                _bullet.x = cloud_x2 + rand_x
+            _bullet.y += 5
+            _bullet.x += 1
+
+    if Cutscene == 1:
+        window.fill(pitch_black)
+        window.blit(message1,(150,150))
+        pygame.time.wait(300)
+        Screen += 1
+
+       
+
+
+
+
+        
+
+
+    
+
+        
+
 
  # Make sure to make death not permenent
-    if collision == True or collision2 == True:
+    if collision == True:
         hp -= 5
         print(hp)
     if hp < 0:
         running = False
         window.fill(pitch_black)
-        window.blit(gg,(200, 150))
+        window.blit(dead_star_guy,(300- (star_guy_spr.get_width()/2),200-(star_guy_spr.get_height()/2)))
+        window.blit(gg,(370, 100))
 
     pygame.display.flip()
 
     clock.tick(60)
+
+
+
+pygame.time.wait(800)
+
+
+
+pygame.quit()
 
 
 
